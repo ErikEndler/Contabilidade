@@ -1,30 +1,63 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </div>
-  <router-view/>
+  <body>
+    <header>
+      <header-app />
+    </header>
+    <main class="main">
+      <section class="content">
+        <router-view />
+      </section>
+    </main>
+    <ModalFactory />
+
+    <footer-app />
+  </body>
 </template>
+<script>
+  import HeaderApp from "./components/HeaderApp";
+  import FooterApp from "./components/FooterApp";
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+  import { watch } from "vue";
+  import { useRoute, useRouter } from "vue-router";
+  import ModalFactory from "./components/ModalFactory";
+  import services from "./services";
+  import { setCurrentUser } from "./store/user";
+  import useModal from "./hooks/useModal";
 
-#nav {
-  padding: 30px;
-}
+  export default {
+    components: { ModalFactory, HeaderApp, FooterApp },
+    setup() {
+      const router = useRouter();
+      const route = useRoute();
+      const modal = useModal();
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
+      watch(
+        () => (route.path, route.name),
+        async () => {
+          if (route.meta.hasAuth) {
+            const token = window.localStorage.getItem("token");
+            if (!token) {
+              modal.open({ component: "ModalLogin" });
 
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
+              router.push({ name: "Home" });
+              return;
+            } else if (token) {
+              const { data } = await services.users.getMe();
+              setCurrentUser(data);
+            }
+          } else {
+            const token = window.localStorage.getItem("token");
+            if (!token) {
+              return;
+            } else if (token) {
+              const { data } = await services.users.getMe();
+              setCurrentUser(data);
+            }
+          }
+        }
+      );
+    }
+  };
+</script>
+<style >
 </style>
