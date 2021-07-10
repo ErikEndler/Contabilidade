@@ -221,7 +221,10 @@
                     v-for="item in state.conta.itensContaPagar"
                     :key="item.codigo"
                   >
-                    <ItemConta :itemConta="item"></ItemConta>
+                    <ItemConta
+                      :itemConta="item"
+                      :contaCodigo="item.contaPagarCodigo"
+                    ></ItemConta>
                   </div>
                 </div>
               </div>

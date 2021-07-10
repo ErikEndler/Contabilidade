@@ -7,6 +7,7 @@
     autocomplete="off"
   >
     <div class="row">
+      {{ itemConta.contaPagarCodigo }}
       <div class="col-3">
         <label>Setor</label>
         <input
@@ -82,7 +83,7 @@
 </template>
 
 <script>
-  import { reactive, toRaw } from "vue";
+  import { onMounted, reactive, toRaw } from "vue";
   import validators from "../../utils/validators";
   import useModal from "../../hooks/useModal";
   import { Form } from "vee-validate";
@@ -96,9 +97,15 @@
       Form
     },
     props: {
-      itemConta: { type: Object, required: true }
+      itemConta: { type: Object, required: true },
+      contaCodigo: { type: Number }
     },
     setup(props) {
+      onMounted(() => {
+        if (props.contaCodigo) {
+          state.itemConta.contaPagarCodigo = props.contaCodigo;
+        }
+      });
       const toast = useToast();
       const modal = useModal();
       const state = reactive({
