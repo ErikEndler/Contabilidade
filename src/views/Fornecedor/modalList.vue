@@ -91,7 +91,6 @@ import useModal from '../../hooks/useModal'
             .getAll()
             .then(resposta => {
               state.list = resposta.data;
-              console.log(state.list);
               if (!$.fn.dataTable.isDataTable('#tbFornecedor')) {
                 console.log('entrou if');
                 setTimeout(() => {

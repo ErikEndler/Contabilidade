@@ -67,6 +67,13 @@
           class="btn btn-layout"
           :class="{ 'btn  loading': state.isLoading }"
         >
+          <span
+            v-if="state.isLoading"
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+          >
+          </span>
           Login
         </button>
       </div>
@@ -75,76 +82,77 @@
 </template>
 
 <script>
-  import { reactive } from "vue";
-  import useModal from "../../hooks/useModal";
-  import { useField } from "vee-validate";
-  import validators from "../../utils/validators";
-  import services from "../../services";
-  import { useRouter } from "vue-router";
-  import { useToast } from "vue-toastification";
-  import { setCurrentUser } from "../../store/user";
-  export default {
-    setup() {
-      const toast = useToast();
-      const router = useRouter();
-      const modal = useModal();
-      const { value: loginValue, errorMessage: loginErroMessage } = useField(
-        "login",
-        validators().validateLogin
-      );
-      const { value: senhaValue, errorMessage: senhaErroMessage } = useField(
-        "senha",
-        validators().validateSenha
-      );
-      const state = reactive({
-        hasErrors: false,
-        isLoading: false,
-        login: {
-          value: loginValue,
-          errorMessage: loginErroMessage
-        },
-        senha: {
-          value: senhaValue,
-          errorMessage: senhaErroMessage
-        }
-      });
-
-      async function handleSubmit() {
-        try {
-          toast.clear();
-          state.isLoading = true;
-          const { data, errors } = await services.auth.login({
-            login: state.login.value,
-            senha: state.senha.value
-          });
-          if (!errors) {
-            window.localStorage.setItem("token", data.token);
-            router.push({ name: "Home" });
-            state.isLoading = false;
-            setCurrentUser({ nome: data.nome });
-            modal.close();
-            return;
-          }
-          if (errors.status === 404) {
-            toast.error("Login não encontrado");
-          }
-          if (errors.status === 401) {
-            toast.error("Login / Senha invalidos");
-          }
-          if (errors.status === 400) {
-            toast.error("Erro ao tentar fazer login");
-          }
-          state.isLoading = false;
-        } catch (error) {
-          console.log(error);
-          state.isLoading = false;
-          state.hasErrors = !!error;
-          toast.error(error.message);
-        }
+import { reactive } from "vue";
+import useModal from "../../hooks/useModal";
+import { useField } from "vee-validate";
+import validators from "../../utils/validators";
+import services from "../../services";
+import { useRouter } from "vue-router";
+import { useToast } from "vue-toastification";
+import { setCurrentUser } from "../../store/user";
+export default {
+  setup() {
+    const toast = useToast();
+    const router = useRouter();
+    const modal = useModal();
+    const { value: loginValue, errorMessage: loginErroMessage } = useField(
+      "login",
+      validators().validateLogin
+    );
+    const { value: senhaValue, errorMessage: senhaErroMessage } = useField(
+      "senha",
+      validators().validateSenha
+    );
+    const state = reactive({
+      hasErrors: false,
+      isLoading: false,
+      login: {
+        value: loginValue,
+        errorMessage: loginErroMessage
+      },
+      senha: {
+        value: senhaValue,
+        errorMessage: senhaErroMessage
       }
-      return { state, close: modal.close, handleSubmit };
+    });
+    console.log(state);
+
+    async function handleSubmit() {
+      try {
+        toast.clear();
+        state.isLoading = true;
+        const { data, errors } = await services.auth.login({
+          login: state.login.value,
+          senha: state.senha.value
+        });
+        if (!errors) {
+          window.localStorage.setItem("token", data.token);
+          router.push({ name: "Home" });
+          state.isLoading = false;
+          setCurrentUser({ nome: data.nome });
+          modal.close();
+          return;
+        }
+        if (errors.status === 404) {
+          toast.error("Login não encontrado");
+        }
+        if (errors.status === 401) {
+          toast.error("Login / Senha invalidos");
+        }
+        if (errors.status === 400) {
+          toast.error("Erro ao tentar fazer login");
+        }
+        state.isLoading = false;
+      } catch (error) {
+        console.log(error);
+        state.isLoading = false;
+        state.hasErrors = !!error;
+        toast.error(error.message);
+      }
     }
-  };
+    return { state, close: modal.close, handleSubmit };
+  }
+};
 </script>
 
 <style scoped>

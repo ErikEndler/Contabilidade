@@ -10,14 +10,16 @@
         v-on="validate"
         class="form-control border-rounded-1 shadow-blue"
         :class="{
-          'border-rounded-error shadow-error': !!errorMessage,
+          'border-rounded-error shadow-error': !!errorMessage, 'cursor-pointer': !!cursor
         }"
+
         :readonly="readonly"
         :name="name"
         :id="name"
         :type="type"
         :value="valueComputed"
         :placeholder="placeholder"
+
       />
     </div>
     <p class="error-message" v-show="errorMessage">
@@ -38,6 +40,10 @@
     props: {
       readonly: { type: Boolean, default: false },
       mask: {
+        type: String,
+        default: ""
+      },
+      cursor: {
         type: String,
         default: ""
       },
@@ -77,7 +83,7 @@
         field.handleChange;
       }
       const { ...field } = useField(props.name, undefined, {
-        validateOnValueUpdate: false,
+        validateOnValueUpdate: true,
         initialValue: props.value
       });
       const validate = computed(() => {

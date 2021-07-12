@@ -23,6 +23,6 @@ dom.watch();
 const app = createApp(App)
 app.use(Maska)
 app.use(router)
-app.mount('#app')
 app.component("font-awesome-icon", FontAwesomeIcon)
 app.use(Toast, { position: POSITION.BOTTOM_RIGHT })
+app.mount('#app')

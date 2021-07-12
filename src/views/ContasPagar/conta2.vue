@@ -116,14 +116,16 @@
           </div>
           <div class="row">
             <div class="col-12">
-              <label>Fornecedor</label>
-              <input
-                style="cursor: pointer"
-                class="form-control border-rounded-1 shadow-blue"
+              <TextInput
+                v-model:value="state.conta.fornecedor.razaoSocial"
+                :reset="state.resetForm"
+                name="fornecedor"
                 type="text"
-                v-model="state.conta.fornecedor.razaoSocial"
-                @click="modalFornecedor"
+                label="Fornecedor"
+                placeholder=""
                 readonly
+                @click="modalFornecedor"
+                cursor="cursor-pointer"
               />
             </div>
           </div>
@@ -175,7 +177,6 @@
                   precision: 2,
                 }"
               />
-              {{ state.conta.valor }}
             </div>
             <div class="col">
               <CurrencyInput
@@ -190,7 +191,6 @@
                 }"
                 placeholder=""
               />
-              {{ state.conta.valorPago }}
             </div>
           </div>
         </Form>
@@ -226,6 +226,14 @@
                       :contaCodigo="item.contaPagarCodigo"
                     ></ItemConta>
                   </div>
+                  <div>
+                    <button
+                      @click="addItemConta"
+                      class="btn btn-sm btn-primary"
+                    >
+                      <font-awesome-icon :icon="['fas', 'plus']" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -257,263 +265,273 @@
 </template>
 
 <script>
-  import { reactive, onMounted, toRaw } from "vue";
-  import { Form } from "vee-validate";
-  import TextInput from "../../components/Inputs/TextInput";
-  import CurrencyInput from "../../components/Inputs/CurrencyInput";
-  import validators from "../../utils/validators";
-  import services from "../../services";
-  import useModal from "../../hooks/useModal";
-  import { useToast } from "vue-toastification";
-  import ItemConta from "./itemConta.vue";
-  import moment from "moment";
+import { reactive, onMounted, toRaw } from "vue";
+import { Form } from "vee-validate";
+import TextInput from "../../components/Inputs/TextInput";
+import CurrencyInput from "../../components/Inputs/CurrencyInput";
+import validators from "../../utils/validators";
+import services from "../../services";
+import useModal from "../../hooks/useModal";
+import { useToast } from "vue-toastification";
+import ItemConta from "./itemConta.vue";
+import moment from "moment";
 
-  export default {
-    components: {
-      TextInput,
-      Form,
-      ItemConta,
-      CurrencyInput
-    },
-    props: {
-      codigo: {
-        type: [Number],
-        default: null,
-        required: false
-      }
-    },
-    setup(props) {
-      const modal = useModal();
-      const toast = useToast();
-
-      onMounted(() => {
-        if (props.codigo) {
-          if (props.codigo) {
-            getConta(props.codigo);
-          }
-        }
-      });
-      function onSubmit(values) {
-        callModalConfirm();
-        console.log("values: ", values);
-        const objEnvio = Object.assign({}, toRaw(state.conta));
-        delete objEnvio.itensContaPagar;
-        delete objEnvio.titulo;
-        delete objEnvio.fornecedor;
-        // console.log(JSON.stringify(objEnvio, null, 2));
-        console.log(objEnvio);
-        console.log(state.conta);
-      }
-      function callModalConfirm() {
-        modal.open({
-          component: "ModalConfirme",
-          props: { msg: "Confirmar Inserção de conta contabil" }
-        });
-        modal.listen(sendSubmit);
-      }
-      function sendSubmit(payload) {
-        if (payload.answer) {
-          toast.clear();
-          state.isLoading = true;
-          JSON.stringify(state.conta, null, 2);
-          services.contaPagar
-            .put(JSON.stringify(state.conta, null, 2))
-            .then(response => {
-              state.isLoading = false;
-              toast.success("Conta inserida com sucesso", { timeout: false });
-              console.log(response.data);
-            })
-            .catch(error => {
-              state.isLoading = false;
-              console.log(error.response);
-              toast.error(JSON.stringify(error.response.data.errors), {
-                timeout: false
-              });
-            });
-        }
-        modal.off(sendSubmit);
-      }
-      function convertDateTime(data) {
-        if (data) return moment(data).format("YYYY-MM-DD");
-        else return null;
-      }
-      const schema = {
-        emissao: validators().validateCampoObrigatorio,
-        vencimento: validators().validateCampoObrigatorio
-      };
-
-      const state = reactive({
-        fornecedor: null,
-        search: null,
-        resetForm: false,
-        hasErrors: false,
-        isLoading: false,
-        isEdit: false,
-        conta: {
-          caixaCodigo: null,
-          codigo: null,
-          dataPagamento: null,
-          emissao: null,
-          filiadoCodigo: null,
-          fornecedor: {
-            codigo: null,
-            razaoSocial: null,
-            nomeNomeFantasia: null
-          },
-          fornecedorCodigo: null,
-          historico: null,
-          itensContaPagar: [
-            {
-              centroCustoCodigo: null,
-              codigo: null,
-              contaPagarCodigo: null,
-              contaRateio: {
-                codigo: null,
-                descricao: null,
-                contaContabilDebito: null,
-                contaContabilCredito: null,
-                descricaoFormaRateio: null
-              },
-              setor: { codigo: null, descricao: null },
-              setorCodigo: null,
-              valor: null
-            }
-          ],
-          mesRef: null,
-          numeroTitulo: null,
-          titulo: { codigo: null, descricao: null, status: null },
-          tituloCodigo: null,
-          valor: null,
-          valorPago: null,
-          vencimento: null
-        }
-      });
-      function modalTitulo() {
-        modal.open({
-          component: "ModalTitulo",
-          props: {}
-        });
-        modal.listen(changeTitulo);
-      }
-      function changeTitulo(payload) {
-        console.log(payload);
-        if (payload.titulo) {
-          state.conta.titulo = payload.titulo;
-        }
-        modal.off(changeTitulo);
-      }
-      function modalFornecedor() {
-        modal.open({
-          component: "ModalFornecedor",
-          props: {}
-        });
-        modal.listen(changeFornecedor);
-      }
-      function changeFornecedor(payload) {
-        console.log(payload);
-        if (payload.fornecedor) {
-          state.conta.fornecedor = payload.fornecedor;
-        }
-        modal.off(changeTitulo);
-      }
-      function filterFunction(event) {
-        services.fornecedor
-          .getAll(event.target.value)
-          .then(
-            response => (
-              (state.fornecedor = response.data), console.log(state.fornecedor)
-            )
-          );
-      }
-
-      function getConta(codigo) {
-        services.contaPagar.get({ codigo: codigo }).then(response => {
-          if (Object.keys(response.data).length > 0) {
-            console.log(response.data);
-            state.conta = response.data;
-            if (!state.conta.titulo) {
-              state.conta.titulo = {};
-              const tituloPadrao = {
-                codigo: null,
-                descricao: null,
-                status: null
-              };
-              Object.assign(state.conta.titulo, tituloPadrao);
-            }
-            console.log(state.conta.itensContaPagar.length);
-            if (
-              !state.conta.itensContaPagar ||
-              state.conta.itensContaPagar.length === 0
-            ) {
-              const itensPadrao = [
-                {
-                  centroCustoCodigo: null,
-                  codigo: null,
-                  contaPagarCodigo: null,
-                  contaRateio: {
-                    codigo: null,
-                    descricao: null,
-                    contaContabilDebito: null,
-                    contaContabilCredito: null,
-                    descricaoFormaRateio: null
-                  },
-                  setor: { codigo: null, descricao: null },
-                  setorCodigo: null,
-                  valor: null
-                }
-              ];
-              Object.assign(state.conta.itensContaPagar, itensPadrao);
-              console.log("item vazio");
-            }
-            if (!state.conta.fornecedor) {
-              state.conta.fornecedor = {};
-              const fornecedorPadrao = {
-                codigo: "",
-                razaoSocial: "",
-                nomeNomeFantasia: ""
-              };
-              Object.assign(state.conta.fornecedor, fornecedorPadrao);
-            }
-            console.log(state.conta);
-          } else {
-            resetObjet(state.conta);
-          }
-          state.isEdit = true;
-        });
-      }
-      function searchConta() {
-        getConta(state.search);
-      }
-
-      function formReset() {
-        state.resetForm = true;
-        resetObjet(state.conta);
-      }
-      function resetObjet(obj) {
-        for (const property in obj) {
-          if (`${obj[property]}` === "[object Object]") {
-            const subObj = obj[property];
-            resetObjet(subObj);
-          } else {
-            obj[property] = null;
-          }
-        }
-        //console.log(obj);
-      }
-
-      return {
-        formReset,
-        state,
-        onSubmit,
-        schema,
-        searchConta,
-        filterFunction,
-        convertDateTime,
-        modalTitulo,
-        modalFornecedor
-      };
+export default {
+  components: {
+    TextInput,
+    Form,
+    ItemConta,
+    CurrencyInput
+  },
+  props: {
+    codigo: {
+      type: [Number],
+      default: null,
+      required: false
     }
-  };
+  },
+  setup(props) {
+    const modal = useModal();
+    const toast = useToast();
+
+    onMounted(() => {
+      if (props.codigo) {
+        if (props.codigo) {
+          getConta(props.codigo);
+        }
+      }
+    });
+    function onSubmit(values) {
+      callModalConfirm();
+      console.log("values: ", values);
+      const objEnvio = Object.assign({}, toRaw(state.conta));
+      delete objEnvio.itensContaPagar;
+      delete objEnvio.titulo;
+      delete objEnvio.fornecedor;
+      // console.log(JSON.stringify(objEnvio, null, 2));
+      console.log(objEnvio);
+      console.log(state.conta);
+    }
+    function callModalConfirm() {
+      modal.open({
+        component: "ModalConfirme",
+        props: { msg: "Confirmar Inserção de conta contabil" }
+      });
+      modal.listen(sendSubmit);
+    }
+    function sendSubmit(payload) {
+      if (payload.answer) {
+        toast.clear();
+        state.isLoading = true;
+        let req = null;
+        if (state.itemConta.codigo) {
+          req = services.contaPagar.post(JSON.stringify(state.conta, null, 2));
+        } else {
+          req = services.contaPagar.put(JSON.stringify(state.conta, null, 2));
+        }
+        req
+          .then(response => {
+            state.isLoading = false;
+            toast.success("Conta inserida com sucesso", { timeout: false });
+            console.log(response.data);
+          })
+          .catch(error => {
+            state.isLoading = false;
+            console.log(error.response);
+            toast.error(JSON.stringify(error.response.data.errors), {
+              timeout: false
+            });
+          });
+      }
+      modal.off(sendSubmit);
+    }
+    function convertDateTime(data) {
+      if (data) return moment(data).format("YYYY-MM-DD");
+      else return null;
+    }
+    const schema = {
+      emissao: validators().validateCampoObrigatorio,
+      vencimento: validators().validateCampoObrigatorio
+    };
+    const state = reactive({
+      fornecedor: null,
+      search: null,
+      resetForm: false,
+      hasErrors: false,
+      isLoading: false,
+      isEdit: false,
+      conta: {
+        caixaCodigo: null,
+        codigo: null,
+        dataPagamento: null,
+        emissao: null,
+        filiadoCodigo: null,
+        fornecedor: {
+          codigo: null,
+          razaoSocial: null,
+          nomeNomeFantasia: null
+        },
+        fornecedorCodigo: null,
+        historico: null,
+        itensContaPagar: [
+          {
+            centroCustoCodigo: null,
+            codigo: null,
+            contaPagarCodigo: null,
+            contaRateio: {
+              codigo: null,
+              descricao: null,
+              contaContabilDebito: null,
+              contaContabilCredito: null,
+              descricaoFormaRateio: null
+            },
+            setor: { codigo: null, descricao: null },
+            setorCodigo: null,
+            valor: null
+          }
+        ],
+        mesRef: null,
+        numeroTitulo: null,
+        titulo: { codigo: null, descricao: null, status: null },
+        tituloCodigo: null,
+        valor: null,
+        valorPago: null,
+        vencimento: null
+      }
+    });
+    const itensPadrao = [
+      {
+        centroCustoCodigo: null,
+        codigo: null,
+        contaPagarCodigo: null,
+        contaRateio: {
+          codigo: null,
+          descricao: null,
+          contaContabilDebito: null,
+          contaContabilCredito: null,
+          descricaoFormaRateio: null
+        },
+        setor: { codigo: null, descricao: null },
+        setorCodigo: null,
+        valor: null
+      }
+    ];
+    function modalTitulo() {
+      modal.open({
+        component: "ModalTitulo",
+        props: {}
+      });
+      modal.listen(changeTitulo);
+    }
+    function changeTitulo(payload) {
+      console.log(payload);
+      if (payload.titulo) {
+        state.conta.titulo = payload.titulo;
+      }
+      modal.off(changeTitulo);
+    }
+    function modalFornecedor() {
+      modal.open({
+        component: "ModalFornecedor",
+        props: {}
+      });
+      modal.listen(changeFornecedor);
+    }
+    function changeFornecedor(payload) {
+      console.log(payload);
+      if (payload.fornecedor) {
+        state.conta.fornecedor = payload.fornecedor;
+      }
+      modal.off(changeFornecedor);
+    }
+    function filterFunction(event) {
+      services.fornecedor
+        .getAll(event.target.value)
+        .then(
+          response => (
+            (state.fornecedor = response.data), console.log(state.fornecedor)
+          )
+        );
+    }
+
+    function getConta(codigo) {
+      services.contaPagar.get({ codigo: codigo }).then(response => {
+        if (Object.keys(response.data).length > 0) {
+          console.log(response.data);
+          state.conta = response.data;
+          if (!state.conta.titulo) {
+            state.conta.titulo = {};
+            const tituloPadrao = {
+              codigo: null,
+              descricao: null,
+              status: null
+            };
+            Object.assign(state.conta.titulo, tituloPadrao);
+          }
+          console.log(state.conta.itensContaPagar.length);
+          if (
+            !state.conta.itensContaPagar ||
+            state.conta.itensContaPagar.length === 0
+          ) {
+            Object.assign(state.conta.itensContaPagar, itensPadrao);
+            console.log("item vazio");
+          }
+          if (!state.conta.fornecedor) {
+            state.conta.fornecedor = {};
+            const fornecedorPadrao = {
+              codigo: "",
+              razaoSocial: "",
+              nomeNomeFantasia: ""
+            };
+            Object.assign(state.conta.fornecedor, fornecedorPadrao);
+          }
+          console.log(state.conta);
+        } else {
+          resetObjet(state.conta);
+        }
+        state.isEdit = true;
+      });
+    }
+    function addItemConta() {
+      let item = itensPadrao[0]
+      item.contaPagarCodigo=state.conta.codigo;
+      state.conta.itensContaPagar.push(item);
+      console.log(state.conta.itensContaPagar);
+    }
+    function searchConta() {
+      getConta(state.search);
+    }
+
+    function formReset() {
+      state.resetForm = true;
+      resetObjet(state.conta);
+    }
+    function resetObjet(obj) {
+      for (const property in obj) {
+        if (`${obj[property]}` === "[object Object]") {
+          const subObj = obj[property];
+          resetObjet(subObj);
+        } else {
+          obj[property] = null;
+        }
+      }
+      //console.log(obj);
+    }
+
+    return {
+      formReset,
+      state,
+      onSubmit,
+      schema,
+      searchConta,
+      filterFunction,
+      convertDateTime,
+      modalTitulo,
+      modalFornecedor,
+      addItemConta
+    };
+  }
+};
 </script>
 
 <style scoped>
