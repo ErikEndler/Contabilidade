@@ -23,7 +23,7 @@
         <div class="card-header">
           <div class="card-title h5">
             <font-awesome-icon :icon="['fas', 'plus']" /> Adicionar conta (Plano
-            Contabil)
+            de Contas)
           </div>
         </div>
         <div class="card-body">Inserir uma conta no plano contabil</div>
@@ -42,7 +42,7 @@
           </div>
         </div>
         <div class="card-body">
-          <p>Clique para ver/listar as Contas Rateio</p>
+          <p>Clique para ver/listar as Contas Rateio (Centro de Custo)</p>
         </div>
         <div class="card-footer">
           <button class="btn btn-layout" @click="navigateContaRateioList">
@@ -55,12 +55,30 @@
       <div class="card shadow-blue border-rounded-1">
         <div class="card-header">
           <div class="card-title h5">
-            <font-awesome-icon :icon="['fas', 'plus']" /> Conta Rateio
+            <font-awesome-icon :icon="['fas', 'plus']" /> Adicionar Conta Rateio
           </div>
         </div>
-        <div class="card-body">Adicione uma conta rateio</div>
+        <div class="card-body">Adicione uma conta rateio (Centro de Custo)</div>
         <div class="card-footer">
           <button class="btn btn-layout" @click="navigateContaRateioForm">
+            Acessar
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="card shadow-blue border-rounded-1">
+        <div class="card-header">
+          <div class="card-title h5">
+            <font-awesome-icon :icon="['fas', 'list']" /> Classificações
+            Contabeis
+          </div>
+        </div>
+        <div class="card-body">
+          Visualize as classificações contabeis de um mes
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-layout" @click="navigateClassificacaoContabil">
             Acessar
           </button>
         </div>
@@ -80,7 +98,7 @@
         router.push({ name: "PlanoDeContasList" });
       }
       function navigatePlanoForm() {
-        router.push({ name: "PlanoDeContasForm" });
+        router.push({ name: "PlanoDeContasForm2" });
       }
       function navigateContaRateioForm() {
         router.push({ name: "ContaRateioForm" });
@@ -88,13 +106,18 @@
       function navigateContaRateioList() {
         router.push({ name: "ContaRateioList" });
       }
+      function navigateClassificacaoContabil() {
+        router.push({ name: "ClassificacaoContabil" });
+      }
+      //ClassificacaoContabil
 
       return {
         router,
         navigatePlanoList,
         navigatePlanoForm,
         navigateContaRateioForm,
-        navigateContaRateioList
+        navigateContaRateioList,
+        navigateClassificacaoContabil
       };
     }
   };

@@ -1,5 +1,11 @@
 <template>
   <div class="row">
+    <div class="col-auto align-self-end">
+      <button @click="$router.go(-1)" class="btn btn-outline btn-cancel">
+        <font-awesome-icon :icon="['fas', 'arrow-left']" />
+        Voltar
+      </button>
+    </div>
     <div class="col-auto">
       <label>Data Inicial</label>
       <input
@@ -34,7 +40,11 @@
     </div>
   </div>
 
-  <div v-if="state.showTable" class="card border-rounded-1">
+  <div
+    v-if="state.showTable"
+    class="card border-rounded-1"
+    style="margin-top: 7px"
+  >
     <table
       class="display table table-bordered table-striped hover compact nowrap"
       id="example"
@@ -101,6 +111,7 @@
         showTable: false
       });
       onMounted(() => {
+        initialDate();
         //handleListPlano();
       });
       function handleError(error) {
@@ -152,6 +163,14 @@
           handleError(error);
         }
       }
+      function initialDate() {
+        state.dataFinal = moment()
+          .endOf("month")
+          .format("YYYY-MM-DD");
+        state.dataInicial = moment()
+          .startOf("month")
+          .format("YYYY-MM-DD");
+      }
 
       function callModalConfirm(plano) {
         state.plano = plano;
@@ -200,21 +219,4 @@
 </script>
 
 <style>
-.dataTables_wrapper {
-  padding: 10px;
-}
-.table.dataTable th {
-  background-color: #00154fec;
-  color: #ffd55a;
-}
-.dataTables_filter {
-  margin: 5px;
-}
-table#example.dataTable tbody tr:hover {
-  background-color: #ffa;
-}
-
-table#example.dataTable tbody tr:hover > .sorting_1 {
-  background-color: #ffa;
-}
 </style>

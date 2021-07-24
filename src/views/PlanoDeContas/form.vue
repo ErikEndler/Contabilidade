@@ -6,7 +6,7 @@
       </div>
       <div class="card-body">
         <div class="mb-3">
-          <label class="form-label"> <b>Referencia</b> </label>
+          <label class="form-label"> <b>Referência</b> </label>
           <input
             v-maska="'###*'"
             v-on="validateReferencia"

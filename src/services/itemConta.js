@@ -6,9 +6,11 @@ export default (httpClient) => ({
     return httpClient.get("api/itemcontapagar/" + `${codigo}`);
   },
   put: async (iemConta) => {
-    return httpClient.post('/api/itemcontapagar', iemConta);
+    console.log(iemConta)
+    return httpClient.put('/api/itemcontapagar', iemConta);
   },
   post: async (iemConta) => {
+    console.log(iemConta)
     return httpClient.post('/api/itemcontapagar', iemConta);
   },
 });

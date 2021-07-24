@@ -1,6 +1,8 @@
 <template>
   <div>
-    <label :for="name">{{ label }}</label>
+    <label :for="name">
+      <b>{{ label }}</b>
+    </label>
     <input
       class="form-control border-rounded-1 shadow-blue"
       ref="inputRef"

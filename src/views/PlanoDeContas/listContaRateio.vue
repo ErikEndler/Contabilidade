@@ -1,4 +1,17 @@
 <template>
+  <div class="text-center" v-show="state.isLoading">
+    <div class="d-flex justify-content-center">
+      <div class="d-flex justify-content-center">
+        <div class="loader-css"></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-auto" style="margin-bottom: 5px">
+    <button @click="$router.go(-1)" class="btn btn-outline btn-cancel">
+      <font-awesome-icon :icon="['fas', 'arrow-left']" />
+      Voltar
+    </button>
+  </div>
   <div class="border-rounded-1 shadow-blue card">
     <table
       class="
@@ -21,15 +34,6 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-if="state.isLoading">
-          <td colspan="6" class="text-center">
-            <progress style="width: 100%" class="progress" max="200"></progress>
-          </td>
-        </tr>
-
-        <tr v-if="state.listEmpty">
-          <td colspan="6" class="text-center">Lista vazia</td>
-        </tr>
         <tr v-for="conta in state.listContas" :key="conta.codigo">
           <td>{{ conta.descricao }}</td>
           <td>{{ conta.contaContabilDebito }}</td>
@@ -103,7 +107,6 @@
             .getAll()
             .then(resposta => {
               state.listContas = resposta.data;
-              console.log(resposta.data);
               setTimeout(() => {
                 $("#example").DataTable({
                   language: {
@@ -113,7 +116,8 @@
                     infoEmpty: "Sem dados",
                     infoFiltered: "(filtrado de _MAX_ total linhas)"
                   },
-                  scrollY: "50vh",
+                  lengthMenu: [20, 25, 50, 75, 100],
+                  scrollY: "60vh",
                   scrollCollapse: true
                 });
                 state.isLoading = false;
@@ -140,9 +144,6 @@
 </script>
 
 <style>
-.dataTables_wrapper {
-  padding: 10px;
-}
 .table.dataTable th {
   background-color: #00154fec;
   color: #ffd55a;

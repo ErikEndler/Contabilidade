@@ -9,14 +9,12 @@
       </section>
     </main>
     <ModalFactory />
-
     <footer-app />
   </body>
 </template>
 <script>
   import HeaderApp from "./components/HeaderApp";
   import FooterApp from "./components/FooterApp";
-
   import { watch } from "vue";
   import { useRoute, useRouter } from "vue-router";
   import ModalFactory from "./components/ModalFactory";

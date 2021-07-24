@@ -26,7 +26,13 @@
           </div>
         </div>
         <div class="card-body">
-          Selecione um periodo e veja os erros das Contas
+          Selecione um periodo e busque possiveis erros nas contas a pagar
+          <p>
+            <b>Problemas detectaveis :</b><br />
+            - 'Problema soma valores'<br />
+            - 'Problema valores parcela'<br />
+            - 'Fornecedor sem codigo contabil vinculado'
+          </p>
         </div>
         <div class="card-footer">
           <button class="btn btn-layout" @click="navigateContaPromlems">

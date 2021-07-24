@@ -1,43 +1,54 @@
 <template>
-  <div class="card col-3 mx-auto border-rounded-1">
-    <div class="accordion accordion-flush" id="accordionFlushExample">
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="flush-headingOne">
-          <button
-            class="accordion-button collapsed"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#flush-collapseOne"
-            aria-expanded="false"
-            aria-controls="flush-collapseOne"
+  <div class="row">
+    <div class="col-auto">
+      <button @click="$router.go(-1)" class="btn btn-outline btn-cancel">
+        <font-awesome-icon :icon="['fas', 'arrow-left']" />
+        Voltar
+      </button>
+    </div>
+    <div
+      class="col-3 mx-auto border-rounded-1"
+      style="padding-right: 0px; padding-left: 0px"
+    >
+      <div class="accordion accordion-flush" id="accordionFlushExample">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="flush-headingOne">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#flush-collapseOne"
+              aria-expanded="false"
+              aria-controls="flush-collapseOne"
+            >
+              Pesquisar Conta
+            </button>
+          </h2>
+          <div
+            id="flush-collapseOne"
+            class="accordion-collapse collapse"
+            aria-labelledby="flush-headingOne"
+            data-bs-parent="#accordionFlushExample"
           >
-            Pesquisar Conta
-          </button>
-        </h2>
-        <div
-          id="flush-collapseOne"
-          class="accordion-collapse collapse"
-          aria-labelledby="flush-headingOne"
-          data-bs-parent="#accordionFlushExample"
-        >
-          <div class="accordion-body">
-            <div class="row">
-              <div class="col-9">
-                <input
-                  v-model="state.search"
-                  class="form-control border-rounded-1 shadow-blue"
-                  type="text"
-                  placeholder="Código"
-                />
-              </div>
-              <div class="col-3">
-                <button
-                  class="btn btn-layout"
-                  style="min-width: 50px"
-                  @click="searchConta(state.search)"
-                >
-                  <font-awesome-icon :icon="['fas', 'search']" />
-                </button>
+            <div class="accordion-body">
+              <div class="row">
+                <div class="col-9">
+                  <input
+                    v-model="state.search"
+                    class="form-control border-rounded-1 shadow-blue"
+                    type="text"
+                    placeholder="Código"
+                  />
+                </div>
+                <div class="col-3">
+                  <button
+                    class="btn btn-layout"
+                    style="min-width: 50px"
+                    @click="searchConta(state.search)"
+                  >
+                    <font-awesome-icon :icon="['fas', 'search']" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -45,6 +56,7 @@
       </div>
     </div>
   </div>
+
   <div class="mg-top-10 container">
     <div class="border-rounded-1 shadow-blue card">
       <div class="card-header">
@@ -78,7 +90,8 @@
                 name="mesRef"
                 type="text"
                 label="mesRef"
-                placeholder=""
+                placeholder="--/--"
+                mask="##/##"
               />
             </div>
           </div>
@@ -215,21 +228,32 @@
                 aria-labelledby="headingOne"
                 data-bs-parent="#accordionExample"
               >
-                <div class="accordion-body">
+                <div
+                  class="accordion-body"
+                  style="max-height: 250px; overflow: auto"
+                >
                   <div
                     class="row"
-                    v-for="item in state.conta.itensContaPagar"
-                    :key="item.codigo"
+                    v-for="(item, index) in state.conta.itensContaPagar"
+                    :key="index"
                   >
                     <ItemConta
+                      @remove-item="removeItemConta"
                       :itemConta="item"
                       :contaCodigo="item.contaPagarCodigo"
+                      :index="index"
                     ></ItemConta>
                   </div>
+                </div>
+                <div class="accordion-footer">
                   <div>
                     <button
+                      style="cursor: pointer; margin: 5px"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title="Adicionar Item"
                       @click="addItemConta"
-                      class="btn btn-sm btn-primary"
+                      class="btn btn-sm btn-layout"
                     >
                       <font-awesome-icon :icon="['fas', 'plus']" />
                     </button>
@@ -265,142 +289,143 @@
 </template>
 
 <script>
-import { reactive, onMounted, toRaw } from "vue";
-import { Form } from "vee-validate";
-import TextInput from "../../components/Inputs/TextInput";
-import CurrencyInput from "../../components/Inputs/CurrencyInput";
-import validators from "../../utils/validators";
-import services from "../../services";
-import useModal from "../../hooks/useModal";
-import { useToast } from "vue-toastification";
-import ItemConta from "./itemConta.vue";
-import moment from "moment";
+  import { reactive, onMounted, toRaw } from "vue";
+  import { Form } from "vee-validate";
+  import TextInput from "../../components/Inputs/TextInput";
+  import CurrencyInput from "../../components/Inputs/CurrencyInput";
+  import validators from "../../utils/validators";
+  import services from "../../services";
+  import useModal from "../../hooks/useModal";
+  import { useToast } from "vue-toastification";
+  import ItemConta from "./itemConta.vue";
+  import moment from "moment";
 
-export default {
-  components: {
-    TextInput,
-    Form,
-    ItemConta,
-    CurrencyInput
-  },
-  props: {
-    codigo: {
-      type: [Number],
-      default: null,
-      required: false
-    }
-  },
-  setup(props) {
-    const modal = useModal();
-    const toast = useToast();
+  export default {
+    components: {
+      TextInput,
+      Form,
+      ItemConta,
+      CurrencyInput
+    },
+    props: {
+      codigo: {
+        type: [Number],
+        default: null,
+        required: false
+      }
+    },
+    setup(props) {
+      const modal = useModal();
+      const toast = useToast();
 
-    onMounted(() => {
-      if (props.codigo) {
+      onMounted(() => {
         if (props.codigo) {
-          getConta(props.codigo);
-        }
-      }
-    });
-    function onSubmit(values) {
-      callModalConfirm();
-      console.log("values: ", values);
-      const objEnvio = Object.assign({}, toRaw(state.conta));
-      delete objEnvio.itensContaPagar;
-      delete objEnvio.titulo;
-      delete objEnvio.fornecedor;
-      // console.log(JSON.stringify(objEnvio, null, 2));
-      console.log(objEnvio);
-      console.log(state.conta);
-    }
-    function callModalConfirm() {
-      modal.open({
-        component: "ModalConfirme",
-        props: { msg: "Confirmar Inserção de conta contabil" }
-      });
-      modal.listen(sendSubmit);
-    }
-    function sendSubmit(payload) {
-      if (payload.answer) {
-        toast.clear();
-        state.isLoading = true;
-        let req = null;
-        if (state.itemConta.codigo) {
-          req = services.contaPagar.post(JSON.stringify(state.conta, null, 2));
-        } else {
-          req = services.contaPagar.put(JSON.stringify(state.conta, null, 2));
-        }
-        req
-          .then(response => {
-            state.isLoading = false;
-            toast.success("Conta inserida com sucesso", { timeout: false });
-            console.log(response.data);
-          })
-          .catch(error => {
-            state.isLoading = false;
-            console.log(error.response);
-            toast.error(JSON.stringify(error.response.data.errors), {
-              timeout: false
-            });
-          });
-      }
-      modal.off(sendSubmit);
-    }
-    function convertDateTime(data) {
-      if (data) return moment(data).format("YYYY-MM-DD");
-      else return null;
-    }
-    const schema = {
-      emissao: validators().validateCampoObrigatorio,
-      vencimento: validators().validateCampoObrigatorio
-    };
-    const state = reactive({
-      fornecedor: null,
-      search: null,
-      resetForm: false,
-      hasErrors: false,
-      isLoading: false,
-      isEdit: false,
-      conta: {
-        caixaCodigo: null,
-        codigo: null,
-        dataPagamento: null,
-        emissao: null,
-        filiadoCodigo: null,
-        fornecedor: {
-          codigo: null,
-          razaoSocial: null,
-          nomeNomeFantasia: null
-        },
-        fornecedorCodigo: null,
-        historico: null,
-        itensContaPagar: [
-          {
-            centroCustoCodigo: null,
-            codigo: null,
-            contaPagarCodigo: null,
-            contaRateio: {
-              codigo: null,
-              descricao: null,
-              contaContabilDebito: null,
-              contaContabilCredito: null,
-              descricaoFormaRateio: null
-            },
-            setor: { codigo: null, descricao: null },
-            setorCodigo: null,
-            valor: null
+          if (props.codigo) {
+            getConta(props.codigo);
           }
-        ],
-        mesRef: null,
-        numeroTitulo: null,
-        titulo: { codigo: null, descricao: null, status: null },
-        tituloCodigo: null,
-        valor: null,
-        valorPago: null,
-        vencimento: null
+        }
+      });
+      function onSubmit(values) {
+        callModalConfirm();
+        console.log("values: ", values);
       }
-    });
-    const itensPadrao = [
-      {
+      function callModalConfirm() {
+        modal.open({
+          component: "ModalConfirme",
+          props: { msg: "Confirmar Inserção/Alteração de conta a pagar" }
+        });
+        modal.listen(sendSubmit);
+      }
+      function sendSubmit(payload) {
+        if (payload.answer) {
+          const objEnvio = Object.assign({}, toRaw(state.conta));
+          delete objEnvio.itensContaPagar;
+          delete objEnvio.titulo;
+          delete objEnvio.fornecedor;
+          // console.log(JSON.stringify(objEnvio, null, 2));
+          console.log("objEnvio - ", objEnvio);
+          console.log(JSON.stringify(objEnvio));
+          toast.clear();
+          state.isLoading = true;
+          let req = null;
+          if (state.conta.codigo) {
+            req = services.contaPagar.put(objEnvio);
+          } else {
+            req = services.contaPagar.post(objEnvio);
+          }
+          req
+            .then(response => {
+              state.isLoading = false;
+              toast.success("Conta inserida/atualizada com sucesso", {
+                timeout: false
+              });
+              console.log(response.data);
+            })
+            .catch(error => {
+              state.isLoading = false;
+              console.log(error.response);
+              toast.error(JSON.stringify(error.response.data.errors), {
+                timeout: false
+              });
+            });
+        }
+        modal.off(sendSubmit);
+      }
+      function convertDateTime(data) {
+        if (data) return moment(data).format("YYYY-MM-DD");
+        else return null;
+      }
+      const schema = {
+        emissao: validators().validateCampoObrigatorio,
+        vencimento: validators().validateCampoObrigatorio
+      };
+      const state = reactive({
+        fornecedor: null,
+        search: null,
+        resetForm: false,
+        hasErrors: false,
+        isLoading: false,
+        isEdit: false,
+        conta: {
+          caixaCodigo: null,
+          codigo: null,
+          dataPagamento: null,
+          emissao: null,
+          filiadoCodigo: null,
+          fornecedor: {
+            codigo: null,
+            razaoSocial: null,
+            nomeNomeFantasia: null
+          },
+          fornecedorCodigo: null,
+          historico: null,
+          itensContaPagar: [
+            {
+              centroCustoCodigo: null,
+              codigo: null,
+              contaPagarCodigo: null,
+              contaRateio: {
+                codigo: null,
+                descricao: null,
+                contaContabilDebito: null,
+                contaContabilCredito: null,
+                descricaoFormaRateio: null
+              },
+              setor: { codigo: null, descricao: null },
+              setorCodigo: null,
+              valor: null
+            }
+          ],
+          mesRef: null,
+          numeroTitulo: null,
+          titulo: { codigo: null, descricao: null, status: null },
+          tituloCodigo: null,
+          valor: null,
+          valorPago: null,
+          vencimento: null
+        }
+      });
+      const itensPadrao = {
         centroCustoCodigo: null,
         codigo: null,
         contaPagarCodigo: null,
@@ -414,131 +439,137 @@ export default {
         setor: { codigo: null, descricao: null },
         setorCodigo: null,
         valor: null
+      };
+      const fornecedorPadrao = {
+        codigo: null,
+        razaoSocial: null,
+        nomeNomeFantasia: null
+      };
+      function modalTitulo() {
+        modal.open({
+          component: "ModalTitulo",
+          props: {}
+        });
+        modal.listen(changeTitulo);
       }
-    ];
-    function modalTitulo() {
-      modal.open({
-        component: "ModalTitulo",
-        props: {}
-      });
-      modal.listen(changeTitulo);
-    }
-    function changeTitulo(payload) {
-      console.log(payload);
-      if (payload.titulo) {
-        state.conta.titulo = payload.titulo;
-      }
-      modal.off(changeTitulo);
-    }
-    function modalFornecedor() {
-      modal.open({
-        component: "ModalFornecedor",
-        props: {}
-      });
-      modal.listen(changeFornecedor);
-    }
-    function changeFornecedor(payload) {
-      console.log(payload);
-      if (payload.fornecedor) {
-        state.conta.fornecedor = payload.fornecedor;
-      }
-      modal.off(changeFornecedor);
-    }
-    function filterFunction(event) {
-      services.fornecedor
-        .getAll(event.target.value)
-        .then(
-          response => (
-            (state.fornecedor = response.data), console.log(state.fornecedor)
-          )
-        );
-    }
-
-    function getConta(codigo) {
-      services.contaPagar.get({ codigo: codigo }).then(response => {
-        if (Object.keys(response.data).length > 0) {
-          console.log(response.data);
-          state.conta = response.data;
-          if (!state.conta.titulo) {
-            state.conta.titulo = {};
-            const tituloPadrao = {
-              codigo: null,
-              descricao: null,
-              status: null
-            };
-            Object.assign(state.conta.titulo, tituloPadrao);
-          }
-          console.log(state.conta.itensContaPagar.length);
-          if (
-            !state.conta.itensContaPagar ||
-            state.conta.itensContaPagar.length === 0
-          ) {
-            Object.assign(state.conta.itensContaPagar, itensPadrao);
-            console.log("item vazio");
-          }
-          if (!state.conta.fornecedor) {
-            state.conta.fornecedor = {};
-            const fornecedorPadrao = {
-              codigo: "",
-              razaoSocial: "",
-              nomeNomeFantasia: ""
-            };
-            Object.assign(state.conta.fornecedor, fornecedorPadrao);
-          }
-          console.log(state.conta);
-        } else {
-          resetObjet(state.conta);
+      function changeTitulo(payload) {
+        if (payload.titulo) {
+          state.conta.titulo = payload.titulo;
+          state.conta.tituloCodigo = payload.titulo.codigo;
         }
-        state.isEdit = true;
-      });
-    }
-    function addItemConta() {
-      let item = itensPadrao[0]
-      item.contaPagarCodigo=state.conta.codigo;
-      state.conta.itensContaPagar.push(item);
-      console.log(state.conta.itensContaPagar);
-    }
-    function searchConta() {
-      getConta(state.search);
-    }
+        modal.off(changeTitulo);
+      }
+      function modalFornecedor() {
+        modal.open({
+          component: "ModalFornecedor",
+          props: {}
+        });
+        modal.listen(changeFornecedor);
+      }
+      function changeFornecedor(payload) {
+        if (payload.fornecedor) {
+          state.conta.fornecedor = payload.fornecedor;
+          state.conta.fornecedorCodigo = payload.fornecedor.codigo;
+        }
+        modal.off(changeFornecedor);
+      }
+      function filterFunction(event) {
+        services.fornecedor
+          .getAll(event.target.value)
+          .then(
+            response => (
+              (state.fornecedor = response.data), console.log(state.fornecedor)
+            )
+          );
+      }
 
-    function formReset() {
-      state.resetForm = true;
-      resetObjet(state.conta);
-    }
-    function resetObjet(obj) {
-      for (const property in obj) {
-        if (`${obj[property]}` === "[object Object]") {
-          const subObj = obj[property];
-          resetObjet(subObj);
-        } else {
-          obj[property] = null;
+      function getConta(codigo) {
+        services.contaPagar.get({ codigo: codigo }).then(response => {
+          if (Object.keys(response.data).length > 0) {
+            state.conta = response.data;
+            if (!state.conta.titulo) {
+              state.conta.titulo = {};
+              const tituloPadrao = {
+                codigo: null,
+                descricao: null,
+                status: null
+              };
+              Object.assign(state.conta.titulo, tituloPadrao);
+            }
+            if (
+              !state.conta.itensContaPagar ||
+              state.conta.itensContaPagar.length === 0
+            ) {
+              Object.assign(state.conta.itensContaPagar, itensPadrao);
+            }
+            if (!state.conta.fornecedor) {
+              state.conta.fornecedor = {};
+
+              Object.assign(state.conta.fornecedor, fornecedorPadrao);
+            }
+            console.log(state.conta);
+          } else {
+            resetObjet(state.conta);
+          }
+          state.isEdit = true;
+        });
+      }
+      function addItemConta() {
+        //var copy = Object.assign({}, obj);
+        const item = Object.assign({}, itensPadrao);
+        console.log("item-", item);
+        item.contaPagarCodigo = toRaw(state.conta.codigo);
+        state.conta.itensContaPagar.push(item);
+        console.log("itens - ", toRaw(state.conta.itensContaPagar));
+      }
+      function removeItemConta(codigo) {
+        if (codigo) {
+          state.conta.itensContaPagar = state.conta.itensContaPagar.filter(
+            value => {
+              return value.codigo != codigo;
+            }
+          );
         }
       }
-      //console.log(obj);
-    }
+      function searchConta() {
+        getConta(state.search);
+      }
 
-    return {
-      formReset,
-      state,
-      onSubmit,
-      schema,
-      searchConta,
-      filterFunction,
-      convertDateTime,
-      modalTitulo,
-      modalFornecedor,
-      addItemConta
-    };
-  }
-};
+      function formReset() {
+        state.resetForm = true;
+        resetObjet(state.conta);
+      }
+      function resetObjet(obj) {
+        for (const property in obj) {
+          if (`${obj[property]}` === "[object Object]") {
+            const subObj = obj[property];
+            resetObjet(subObj);
+          } else {
+            obj[property] = null;
+          }
+        }
+      }
+
+      return {
+        formReset,
+        state,
+        onSubmit,
+        schema,
+        searchConta,
+        filterFunction,
+        convertDateTime,
+        modalTitulo,
+        modalFornecedor,
+        addItemConta,
+        removeItemConta
+      };
+    }
+  };
 </script>
-
 <style scoped>
 * {
   box-sizing: border-box;
 }
-
 :root {
   --primary-color: #0071fe;
   --error-color: #f23648;
@@ -546,7 +577,6 @@ export default {
   --success-color: #21a67a;
   --success-bg-color: #e0eee4;
 }
-
 html,
 body {
   width: 100%;
@@ -581,8 +611,10 @@ form {
   transition: transform 0.3s ease-in-out;
   cursor: pointer;
 }
-
 .submit-btn:hover {
   transform: scale(1.1);
+}
+.row {
+  margin-top: -10px;
 }
 </style>

@@ -8,6 +8,16 @@
         <li class="nav-item">
           <a class="btn btn-gold" @click="navigateRecibos">Recibos</a>
         </li>
+        <li class="nav-item">
+          <a
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            title="Classificação Contabil"
+            class="btn btn-gold"
+            @click="navigateClassificacaoContabil"
+            >Clas. Contabil</a
+          >
+        </li>
       </ul>
     </div>
     <div class="mx-auto">
@@ -67,6 +77,10 @@
       function navigateHome() {
         router.push({ name: "Home" });
       }
+      function navigateClassificacaoContabil() {
+        router.push({ name: "ClassificacaoContabil" });
+      }
+      //ClassificacaoContabil
       watch(
         () => store.currentUser,
         () => {
@@ -110,11 +124,12 @@
         state,
         navigateRecibos,
         navigateHome,
-        testeConfirme
+        testeConfirme,
+        navigateClassificacaoContabil
       };
     }
   };
-</script> 
+</script>
 
  <style>
 .navbar-nav .nav-link {

@@ -34,8 +34,8 @@
         <tbody>
           <tr v-if="state.isLoading">
             <td colspan="6" class="text-center">
-              <div class="spinner-border text-success" role="status">
-                <span class="visually-hidden">Loading...</span>
+              <div class="d-flex justify-content-center">
+                <div class="loader-css"></div>
               </div>
             </td>
           </tr>
@@ -138,6 +138,5 @@
     }
   };
 </script>
-
 <style>
 </style>

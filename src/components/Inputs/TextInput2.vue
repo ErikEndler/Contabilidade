@@ -7,23 +7,24 @@
       <span v-if="type === 'number'" class="input-group-text" :id="name"
         >R$</span
       >
+
       <input
         v-maska="mask"
         v-on="validate"
         class="form-control border-rounded-1 shadow-blue"
         :class="{
-          'border-rounded-error shadow-error': !!field.errorMessage.value,
+          'border-rounded-error shadow-error': !!errorMessage,
           'cursor-pointer': !!cursor,
         }"
         :readonly="readonly"
         :name="name"
         :type="type"
-        :value="field.value.value"
+        v-model="value"
         :placeholder="placeholder"
       />
     </div>
-    <p class="error-message" v-show="field.errorMessage.value">
-      {{ field.errorMessage.value }}
+    <p class="error-message" v-show="errorMessage">
+      {{ errorMessage }}
     </p>
     <p class="help-message" v-show="successMessage">
       {{ successMessage }}
@@ -51,7 +52,7 @@
         type: String,
         default: "text"
       },
-      value: {
+      modelValue: {
         type: String,
         default: ""
       },
@@ -70,64 +71,43 @@
       placeholder: {
         type: String,
         default: ""
-      },
-      reset: {
-        type: Boolean,
-        default: false
       }
     },
 
-    setup(props, context) {
-      function updateValue(event) {
-        context.emit("update:value", event.target.value);
-        field.handleChange;
-      }
+    setup(props) {
       const { ...field } = useField(props.name, undefined, {
         validateOnValueUpdate: true,
-        initialValue: valueComputed()
+        initialValue: props.modelValue
       });
       const validate = computed(() => {
         return {
           blur: field.handleChange,
           change: [field.handleChange],
-          input: [updateValue, field.handleChange]
+          input: [field.handleChange]
         };
       });
-
-      function valueComputed() {
+      function valueWatch(value) {
         if (props.type === "date") {
-          return convertDateTime(props.value);
+          field.value.value = convertDateTime(value);
+        } else {
+          field.value.value = value;
         }
-        return props.value;
       }
-
       function convertDateTime(data) {
         if (data) return moment(data).format("YYYY-MM-DD");
         else return null;
       }
       watch(
-        () => props.value,
-        () => {
-          var newValue = valueComputed();
-
-          field.value.value = newValue;
-        }
-      );
-      watch(
-        () => props.reset,
-        () => {
-          console.log("resetou no field");
-          field.resetField();
-          field.meta.value = false;
-          field.errorMessage.valu = null;
+        () => props.modelValue,
+        value => {
+          console.log(value);
+          valueWatch(value);
+          //field.value.value = valueComputed;
         }
       );
       return {
-        updateValue,
-        field,
-        validate,
-        valueComputed,
-        convertDateTime
+        ...field,
+        validate
       };
     }
   };

@@ -8,7 +8,8 @@ import Fornecedor from "./fornecedor";
 import Setor from "./setor";
 import Recibo from "./recibo";
 import Titulo from "./Titulo";
-import ItemCOnta from "./itemConta";
+import ItemConta from "./itemConta";
+import Contabilidade from "./contabilidade";
 import router from "../router";
 import { setGlobaloading } from "../store/global";
 import { clearCurrentUser } from "../store/user";
@@ -70,7 +71,8 @@ export default {
   contaPagar: ContaPagar(httpClient),
   recibo: Recibo(httpClient),
   titulo: Titulo(httpClient),
-  itemCOnta: ItemCOnta(httpClient),
+  itemConta: ItemConta(httpClient),
   setor: Setor(httpClient),
+  contabilidade: Contabilidade(httpClient),
   fornecedor: Fornecedor(httpClient)
 };

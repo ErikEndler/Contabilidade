@@ -1,114 +1,124 @@
 <template>
-  <div class="mg-top-10 container col-8">
-    <div class="border-rounded-1 shadow-blue card">
-      <div class="card-header">
-        <h3>Formulário Conta Rateio</h3>
-      </div>
-      <div class="card-body">
-        <div class="mb-3">
-          <label class="form-label"><b>Descrição</b> </label>
-          <input
-            v-on="validateDescricao"
-            v-model="state.contaRateio.descricao"
-            class="form-control border-rounded-1 shadow-blue"
-            :class="{
-              'border-rounded-error shadow-error':
-                !!state.errorMessage.descricao,
-            }"
-            type="text"
-            placeholder="257 - exemplo"
-          />
-          <div
-            v-if="!!state.errorMessage.descricao"
-            class="alert alert-danger border-rounded-error shadow-error"
-            role="alert"
-          >
-            {{ state.errorMessage.descricao }}
-          </div>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">
-            <b>Conta Contabil Débito</b>
-          </label>
-          <input
-            v-maska="'###*'"
-            v-on="validateContaDebito"
-            v-model="state.contaRateio.contaContabilDebito"
-            class="form-control border-rounded-1 shadow-blue"
-            :class="{
-              'border-rounded-error shadow-error':
-                !!state.errorMessage.contaContabilDebito,
-            }"
-            type="text"
-            placeholder="123"
-          />
-          <div
-            v-if="!!state.errorMessage.contaContabilDebito"
-            class="alert alert-danger border-rounded-error shadow-error"
-            role="alert"
-          >
-            {{ state.errorMessage.contaContabilDebito }}
-          </div>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">
-            <b>Conta Contabil Crédito (Opcional)</b>
-          </label>
-          <input
-            v-on="validateContaCredito"
-            v-model="state.contaRateio.contaContabilCredito"
-            class="form-control border-rounded-1 shadow-blue"
-            :class="{
-              'border-rounded-error shadow-error':
-                !!state.errorMessage.contaContabilCredito,
-            }"
-            type="text"
-            placeholder="123"
-          />
-          <div
-            v-if="!!state.errorMessage.contaContabilCredito"
-            class="alert alert-danger border-rounded-error shadow-error"
-            role="alert"
-          >
-            {{ state.errorMessage.contaContabilCredito }}
-          </div>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">
-            <b>Descrição Forma Rateio (Opcional)</b>
-          </label>
-          <input
-            v-on="validateDescricaoFormaRateio"
-            v-model="state.contaRateio.descricaoFormaRateio"
-            class="form-control border-rounded-1 shadow-blue"
-            :class="{
-              'border-rounded-error shadow-error':
-                !!state.errorMessage.descricaoFormaRateio,
-            }"
-            type="text"
-            placeholder="descrição complementar"
-          />
-          <div
-            v-if="!!state.errorMessage.descricaoFormaRateio"
-            class="alert alert-danger border-rounded-error shadow-error"
-            role="alert"
-          >
-            {{ state.errorMessage.descricaoFormaRateio }}
-          </div>
-        </div>
-      </div>
-      <div class="card-footer">
-        <button
-          :disabled="state.isLoading || !formulario.meta.value.valid"
-          @click.prevent="callModalConfirm"
-          class="btn btn-layout"
-          :class="{ 'btn btn-layout loading': state.isLoading }"
-        >
-          Cadastrar
+  <div class="mg-top-10">
+    <div class="row">
+      <div class="col-auto">
+        <button @click="$router.go(-1)" class="btn btn-outline btn-cancel">
+          <font-awesome-icon :icon="['fas', 'arrow-left']" />
+          Voltar
         </button>
-        <button @click="formReset" class="btn btn-outline btn-cancel">
-          Limpar
-        </button>
+      </div>
+      <div class="col-10">
+        <div class="border-rounded-1 shadow-blue card">
+          <div class="card-header">
+            <h3>Formulário Conta Rateio</h3>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label"><b>Descrição</b> </label>
+              <input
+                v-on="validateDescricao"
+                v-model="state.contaRateio.descricao"
+                class="form-control border-rounded-1 shadow-blue"
+                :class="{
+                  'border-rounded-error shadow-error':
+                    !!state.errorMessage.descricao,
+                }"
+                type="text"
+                placeholder="257 - exemplo"
+              />
+              <div
+                v-if="!!state.errorMessage.descricao"
+                class="alert alert-danger border-rounded-error shadow-error"
+                role="alert"
+              >
+                {{ state.errorMessage.descricao }}
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">
+                <b>Conta Contabil Débito</b>
+              </label>
+              <input
+                v-maska="'###*'"
+                v-on="validateContaDebito"
+                v-model="state.contaRateio.contaContabilDebito"
+                class="form-control border-rounded-1 shadow-blue"
+                :class="{
+                  'border-rounded-error shadow-error':
+                    !!state.errorMessage.contaContabilDebito,
+                }"
+                type="text"
+                placeholder="123"
+              />
+              <div
+                v-if="!!state.errorMessage.contaContabilDebito"
+                class="alert alert-danger border-rounded-error shadow-error"
+                role="alert"
+              >
+                {{ state.errorMessage.contaContabilDebito }}
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">
+                <b>Conta Contabil Crédito (Opcional)</b>
+              </label>
+              <input
+                v-on="validateContaCredito"
+                v-model="state.contaRateio.contaContabilCredito"
+                class="form-control border-rounded-1 shadow-blue"
+                :class="{
+                  'border-rounded-error shadow-error':
+                    !!state.errorMessage.contaContabilCredito,
+                }"
+                type="text"
+                placeholder="123"
+              />
+              <div
+                v-if="!!state.errorMessage.contaContabilCredito"
+                class="alert alert-danger border-rounded-error shadow-error"
+                role="alert"
+              >
+                {{ state.errorMessage.contaContabilCredito }}
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">
+                <b>Descrição Forma Rateio (Opcional)</b>
+              </label>
+              <input
+                v-on="validateDescricaoFormaRateio"
+                v-model="state.contaRateio.descricaoFormaRateio"
+                class="form-control border-rounded-1 shadow-blue"
+                :class="{
+                  'border-rounded-error shadow-error':
+                    !!state.errorMessage.descricaoFormaRateio,
+                }"
+                type="text"
+                placeholder="descrição complementar"
+              />
+              <div
+                v-if="!!state.errorMessage.descricaoFormaRateio"
+                class="alert alert-danger border-rounded-error shadow-error"
+                role="alert"
+              >
+                {{ state.errorMessage.descricaoFormaRateio }}
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <button
+              :disabled="state.isLoading || !formulario.meta.value.valid"
+              @click.prevent="callModalConfirm"
+              class="btn btn-layout"
+              :class="{ 'btn btn-layout loading': state.isLoading }"
+            >
+              Cadastrar
+            </button>
+            <button @click="formReset" class="btn btn-outline btn-cancel">
+              Limpar
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -241,7 +251,6 @@
         });
         modal.listen(onSubmit);
       }
-
       return {
         formulario,
         state,

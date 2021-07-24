@@ -1,12 +1,17 @@
 <template>
-  <div class="card border-rounded-1 text-center" v-show="state.isLoading">
+  <div class="text-center" v-show="state.isLoading">
     <div class="d-flex justify-content-center">
-      <div class="spinner-border text-success" role="status">
-        <span class="visually-hidden">Loading...</span>
+      <div class="d-flex justify-content-center">
+        <div class="loader-css"></div>
       </div>
     </div>
   </div>
-
+  <div class="col-auto" style="margin-bottom: 5px">
+    <button @click="$router.go(-1)" class="btn btn-outline btn-cancel">
+      <font-awesome-icon :icon="['fas', 'arrow-left']" />
+      Voltar
+    </button>
+  </div>
   <div class="card border-rounded-1">
     <table
       class="display table table-bordered table-striped hover compact nowrap"
@@ -22,9 +27,6 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-if="state.listEmpty">
-          <td colspan="6" class="text-center">Lista vazia</td>
-        </tr>
         <tr v-for="plano in state.listPlanos" :key="plano.referencia">
           <td>{{ plano.referencia }}</td>
           <td>{{ plano.descricao }}</td>
@@ -114,7 +116,8 @@
                     infoEmpty: "Sem dados",
                     infoFiltered: "(filtrado de _MAX_ total linhas)"
                   },
-                  scrollY: "50vh",
+                  lengthMenu: [15, 25, 50, 75, 100],
+                  scrollY: "60vh",
                   scrollCollapse: true
                 });
                 state.isLoading = false;
@@ -183,9 +186,6 @@
 </script>
 
 <style>
-.dataTables_wrapper {
-  padding: 10px;
-}
 .table.dataTable th {
   background-color: #00154fec;
   color: #ffd55a;
