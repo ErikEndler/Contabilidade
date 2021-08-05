@@ -5,12 +5,16 @@ export default (httpClient) => ({
   get: async ({ codigo }) => {
     return httpClient.get("api/itemcontapagar/" + `${codigo}`);
   },
-  put: async (iemConta) => {
-    console.log(iemConta)
-    return httpClient.put('/api/itemcontapagar', iemConta);
+  put: async (itemConta) => {
+    console.log(itemConta)
+    return httpClient.put('/api/itemcontapagar', itemConta);
   },
-  post: async (iemConta) => {
-    console.log(iemConta)
-    return httpClient.post('/api/itemcontapagar', iemConta);
+  post: async (itemConta) => {
+    console.log(itemConta)
+    return httpClient.post('/api/itemcontapagar', itemConta);
+  },
+  delete: async (codigo) => {
+    console.log('codigo:', codigo)
+    return httpClient.delete('/api/itemcontapagar/' + `${codigo}`);
   },
 });

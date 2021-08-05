@@ -128,7 +128,21 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-12">
+            <div class="col-auto align-self-center cursor-pointer">
+              <button
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Editar Fornecedor"
+                @click.prevent="navigateFornecedor()"
+                class="btn-sm btn-cancel"
+              >
+                <font-awesome-icon
+                  :icon="['fas', 'external-link-square-alt']"
+                  size="lg"
+                />
+              </button>
+            </div>
+            <div class="col-11">
               <TextInput
                 v-model:value="state.conta.fornecedor.razaoSocial"
                 :reset="state.resetForm"
@@ -232,17 +246,19 @@
                   class="accordion-body"
                   style="max-height: 250px; overflow: auto"
                 >
-                  <div
-                    class="row"
-                    v-for="(item, index) in state.conta.itensContaPagar"
-                    :key="index"
-                  >
-                    <ItemConta
-                      @remove-item="removeItemConta"
-                      :itemConta="item"
-                      :contaCodigo="item.contaPagarCodigo"
-                      :index="index"
-                    ></ItemConta>
+                  <div v-if="state.conta.itensContaPagar">
+                    <div
+                      class="row"
+                      v-for="(item, index) in state.conta.itensContaPagar"
+                      :key="index"
+                    >
+                      <ItemConta
+                        @remove-item="removeItemConta"
+                        :itemConta="item"
+                        :contaCodigo="item.contaPagarCodigo"
+                        :index="index"
+                      ></ItemConta>
+                    </div>
                   </div>
                 </div>
                 <div class="accordion-footer">
@@ -299,6 +315,7 @@
   import { useToast } from "vue-toastification";
   import ItemConta from "./itemConta.vue";
   import moment from "moment";
+  import { useRouter } from "vue-router";
 
   export default {
     components: {
@@ -317,6 +334,7 @@
     setup(props) {
       const modal = useModal();
       const toast = useToast();
+      const router = useRouter();
 
       onMounted(() => {
         if (props.codigo) {
@@ -399,23 +417,7 @@
           },
           fornecedorCodigo: null,
           historico: null,
-          itensContaPagar: [
-            {
-              centroCustoCodigo: null,
-              codigo: null,
-              contaPagarCodigo: null,
-              contaRateio: {
-                codigo: null,
-                descricao: null,
-                contaContabilDebito: null,
-                contaContabilCredito: null,
-                descricaoFormaRateio: null
-              },
-              setor: { codigo: null, descricao: null },
-              setorCodigo: null,
-              valor: null
-            }
-          ],
+          itensContaPagar: [],
           mesRef: null,
           numeroTitulo: null,
           titulo: { codigo: null, descricao: null, status: null },
@@ -484,6 +486,7 @@
       }
 
       function getConta(codigo) {
+        //resetObjet(state.conta);
         services.contaPagar.get({ codigo: codigo }).then(response => {
           if (Object.keys(response.data).length > 0) {
             state.conta = response.data;
@@ -496,15 +499,12 @@
               };
               Object.assign(state.conta.titulo, tituloPadrao);
             }
-            if (
-              !state.conta.itensContaPagar ||
-              state.conta.itensContaPagar.length === 0
-            ) {
-              Object.assign(state.conta.itensContaPagar, itensPadrao);
+            if (!state.conta.itensContaPagar) {
+              console.log("----------------");
+              addItemConta();
             }
             if (!state.conta.fornecedor) {
               state.conta.fornecedor = {};
-
               Object.assign(state.conta.fornecedor, fornecedorPadrao);
             }
             console.log(state.conta);
@@ -529,12 +529,28 @@
               return value.codigo != codigo;
             }
           );
+          console.log("entrou remove itwm");
+          services.itemConta
+            .delete(codigo)
+            .then(() => {
+              console.log("then deu certo");
+              state.isLoading = false;
+              toast.success("Item Deletado com sucesso", {
+                timeout: false
+              });
+            })
+            .catch(error => {
+              state.isLoading = false;
+              console.log(error.response);
+              toast.error(JSON.stringify(error.response.data.errors), {
+                timeout: false
+              });
+            });
         }
       }
       function searchConta() {
         getConta(state.search);
       }
-
       function formReset() {
         state.resetForm = true;
         resetObjet(state.conta);
@@ -549,6 +565,12 @@
           }
         }
       }
+      function navigateFornecedor() {
+        if (state.conta.fornecedorCodigo) {
+          let codigo = toRaw(state.conta.fornecedorCodigo);
+          router.push({ name: "FornecedorEdit", params: { codigo } });
+        }
+      }
 
       return {
         formReset,
@@ -561,7 +583,8 @@
         modalTitulo,
         modalFornecedor,
         addItemConta,
-        removeItemConta
+        removeItemConta,
+        navigateFornecedor
       };
     }
   };

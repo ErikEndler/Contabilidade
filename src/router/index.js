@@ -13,6 +13,9 @@ const ContaView2 = () => import('../views/ContasPagar/conta2.vue')
 const ContaProblems = () => import('../views/ContasPagar/listProblems.vue')
 const Recibos = () => import('../views/Recibos/index.vue')
 const ContabilidadeViews = () => import('../views/Contabilidade/index.vue')
+const Xmls = () => import('../views/Contabilidade/viewXmls.vue')
+const Fornecedor = () => import('../views/Fornecedor/form.vue')
+const FornecedorList = () => import('../views/Fornecedor/list.vue')
 //const table = () => import('../views/Home/table.vue')
 
 const routes = [
@@ -20,6 +23,25 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/fornecedor',
+    name: 'Fornecedor',
+    component: Fornecedor,
+    meta: { hasAuth: true }
+  },
+  {
+    path: '/fornecedor/list',
+    name: 'FornecedorList',
+    component: FornecedorList,
+    meta: { hasAuth: true }
+  },
+  {
+    path: '/fornecedor/:codigo',
+    name: 'FornecedorEdit',
+    component: Fornecedor,
+    meta: { hasAuth: true },
+    props: true
   },
   {
     path: '/recibos',
@@ -30,6 +52,10 @@ const routes = [
     path: '/contabilidade/classificacoes',
     name: 'ClassificacaoContabil',
     component: ContabilidadeViews
+  }, {
+    path: '/contabilidade/xmls',
+    name: 'Xmls',
+    component: Xmls
   },
   {
     path: '/contas',
@@ -50,9 +76,9 @@ const routes = [
     meta: { hasAuth: true }
   },
   {
-    path: '/contas/view/:codigo',
+    path: '/contas/view2/:codigo',
     name: 'ContaViewEdit',
-    component: ContaView,
+    component: ContaView2,
     meta: { hasAuth: true },
     props: true
   },

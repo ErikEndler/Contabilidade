@@ -25,7 +25,7 @@
               v-model="state.view"
             >
               <option
-                v-for="item in listaViews"
+                v-for="item in state.list"
                 v-bind:key="item.index"
                 :value="item"
               >
@@ -44,6 +44,18 @@
           </button>
         </div>
       </div>
+      <div class="row" style="margin-top: 5px">
+        <div class="col">
+          <button
+            class="btn btn-layout"
+            style="min-width: 50px"
+            @click="navigateXMLs()"
+          >
+            Ir para XMLs
+            <font-awesome-icon :icon="['fas', 'arrow-alt-circle-right']" />
+          </button>
+        </div>
+      </div>
     </div>
   </div>
   <div v-if="state.show" class="border-rounded-1 shadow-blue card">
@@ -59,63 +71,79 @@
 
 <script>
   import moment from "moment";
-  import { reactive, toRaw } from "vue";
+  import { onMounted, reactive } from "vue";
   import ClassificacaoContabil from "./classificacaoContabil";
+  import { useRouter } from "vue-router";
+  import { useToast } from "vue-toastification";
+  import services from "../../services";
 
   export default {
     components: { ClassificacaoContabil },
     setup() {
-      const listaViews = [
-        "adiantamento_recibos",
-        "adiantamento_reembolso",
-        "cartao_2018",
-        "cartao_credito_compensado",
-        "cartao_debito_compensado",
-        "cartao_debito_compensado_taxa",
-        "certificado_digital",
-        "cheque_proprio_compensado",
-        "cheque_recebido_compensado",
-        "cobranca_emissao",
-        "cobranca_recebimento",
-        "cobranca_repasse",
-        "conta_fornecedor_emissao",
-        "conta_fornecedor_pagamento",
-        "conta_imposto",
-        "convenio_guias",
-        "fatura_automatica_juros",
-        "fatura_emissao_novo",
-        "fatura_emissao_velho",
-        "fatura_manual",
-        "fatura_perdida",
-        "patrocinio",
-        "rendimento_aplicacao",
-        "spc_receita",
-        "spc_repasse",
-        "tarifa_negativa",
-        "tarifa_positiva",
-        "transferencia"
-      ];
+      onMounted(() => {
+        getListView();
+      });
+      const toast = useToast();
+      const router = useRouter();
+      const view = reactive({ value: null });
       const state = reactive({
+        list: null,
         mesRef: null,
         dataI: null,
         dataF: null,
         view: null,
         show: false
       });
-      const view = reactive({ value: null });
-      function handleSearch() {
-        state.dataF = moment(state.mesRef, "MM/YY ")
-          .endOf("month")
-          .format("YYYY-MM-DD");
-        state.dataI = moment(state.mesRef, "MM/YY ")
-          .startOf("month")
-          .format("YYYY-MM-DD");
-        if (state.view && state.dataI && state.dataF) {
-          state.show = true;
-          view.value = state.view;
+
+      function getListView() {
+        try {
+          state.listEmpty = false;
+          state.isLoading = true;
+          services.contabilidade
+            .getViews()
+            .then(resposta => {
+              state.list = resposta.data;
+              if (state.list.length == 0) {
+                state.listEmpty = true;
+              }
+              state.isLoading = false;
+            })
+            .catch(error => {
+              console.log(error.response);
+              toast.error(JSON.stringify(error.response.data.errors), {
+                timeout: false
+              });
+              state.isLoading = false;
+            });
+        } catch (error) {
+          handleError(error);
         }
-        console.log(toRaw(state));
-        console.log(view);
+      }
+      function handleError(error) {
+        state.isLoading = false;
+        state.hasError = !!error;
+      }
+
+      function handleSearch() {
+        if (state.mesRef && state.mesRef != "") {
+          state.dataF = moment(state.mesRef, "MM/YY ")
+            .endOf("month")
+            .format("YYYY-MM-DD");
+          state.dataI = moment(state.mesRef, "MM/YY ")
+            .startOf("month")
+            .format("YYYY-MM-DD");
+          if (state.view && state.dataI && state.dataF) {
+            state.show = true;
+            view.value = state.view;
+          }
+        } else {
+          toast.error("informe MesRef e Tipo", {
+            timeout: false
+          });
+        }
+      }
+      function navigateXMLs() {
+        router.push({ name: "Xmls" });
       }
 
       //  watch(() => state.mesRef,() => {
@@ -123,7 +151,7 @@
       //    state.dataI = moment(state.mesRef, "MM/YY ").startOf("month").format("YYYY-MM-DD");
       //  });
 
-      return { state, listaViews, handleSearch, view };
+      return { state, handleSearch, view, navigateXMLs };
     }
   };
 </script>

@@ -3,11 +3,12 @@
     <div class="col">
       <div class="card shadow-blue border-rounded-1" id="cards">
         <div class="card-header">
-          <div class="card-title h5">Modulo Contabilidade</div>
+          <div class="card-title h5">Contabilidade</div>
         </div>
         <div class="card-body">
-          <p>Plano de contas</p>
-          <p>Conta rateio</p>
+          <p>Acesse para Inserir, Editar e visualizar :</p>
+          <p>- Plano de contas</p>
+          <p>- Conta rateio (Centro de Custo)</p>
         </div>
         <div class="card-footer">
           <button class="btn btn-layout" @click="navigateContabilidade">
@@ -19,9 +20,12 @@
     <div class="col">
       <div class="card shadow-blue border-rounded-1" id="cards">
         <div class="card-header">
-          <div class="card-title h5">Modulo Contas a Pagar</div>
+          <div class="card-title h5">Contas a Pagar</div>
         </div>
-        <div class="card-body">Altere dados de contas a pagar</div>
+        <div class="card-body">
+          <p>Altere dados de contas a pagar</p>
+          <p>Veja lista de Problemas nas contas a pagar</p>
+        </div>
         <div class="card-footer">
           <button class="btn btn-layout" @click="navigateContasPagar">
             Acessar

@@ -144,7 +144,6 @@
         if (props.codigo) {
           services.contaRateio.get({ codigo: props.codigo }).then(response => {
             state.contaRateio = response.data;
-            console.log(response.data);
             state.isEdit = true;
           });
         }

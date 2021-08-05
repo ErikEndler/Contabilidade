@@ -45,7 +45,6 @@
       watch(
         () => props.modelValue,
         value => {
-          console.log(value);
           setValue(value);
         }
       );

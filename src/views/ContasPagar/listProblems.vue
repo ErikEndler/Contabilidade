@@ -62,6 +62,7 @@
           <td>{{ list.problema }}</td>
           <td style="text-align: center">
             <button
+              @click="handlerEdit(list.codigo)"
               class="btn-sm btn-outline-primary"
               data-bs-toggle="tooltip"
               data-bs-placement="top"
@@ -91,14 +92,12 @@
   import { onMounted, reactive } from "vue";
   import { useToast } from "vue-toastification";
   import services from "../../services";
-  import useModal from "../../hooks/useModal";
   import { useRouter } from "vue-router";
   import moment from "moment";
 
   export default {
     setup() {
       const toast = useToast();
-      const modal = useModal();
       const router = useRouter();
 
       const state = reactive({
@@ -126,8 +125,6 @@
           state.listEmpty = false;
           state.showTable = true;
           state.isLoading = true;
-          //const { data } = await services.planoContas.getAll();
-          // state.listPlanos = data;
           services.contaPagar
             .getProblems(state.dataInicial, state.dataFinal)
             .then(resposta => {
@@ -171,49 +168,11 @@
           .startOf("month")
           .format("YYYY-MM-DD");
       }
-
-      function callModalConfirm(plano) {
-        state.plano = plano;
-        modal.open({
-          component: "ModalConfirme",
-          props: {
-            msg: "Confirmar a inserção deste plano de conta ao Conta Rateio"
-          }
-        });
-        modal.listen(contaRateioAdd);
+      function handlerEdit(codigo) {
+        router.push({ name: "ContaViewEdit", params: { codigo } });
       }
 
-      async function contaRateioAdd(payload) {
-        console.log(payload);
-        if (payload.answer) {
-          try {
-            const contaRateio = {
-              descricao: state.plano.referencia + " - " + state.plano.descricao,
-              contaContabilDebito: state.plano.referencia
-            };
-            // await services.contaRateio.post(contaRateio);
-            console.log("---", contaRateio);
-            services.contaRateio
-              .post({ contaRateio: contaRateio })
-              .then(response => {
-                console.log(response.data);
-              })
-              .catch(error => {
-                console.log(error.response);
-                toast.error(JSON.stringify(error.response.data.errors), {
-                  timeout: false
-                });
-              });
-          } catch (error) {
-            state.isLoading = false;
-            state.hasError = !!error;
-            toast.error(error.status + error.message, { timeout: false });
-          }
-          modal.off(contaRateioAdd);
-          state.plano = null;
-        }
-      }
-      return { router, state, callModalConfirm, handleList };
+      return { router, state, handleList, handlerEdit };
     }
   };
 </script>
