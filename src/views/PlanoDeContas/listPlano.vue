@@ -37,6 +37,7 @@
               data-bs-toggle="tooltip"
               data-bs-placement="top"
               title="Editar"
+              @click="navigateEdit(plano.referencia)"
             >
               <font-awesome-icon icon="edit" />
             </button>
@@ -149,6 +150,9 @@
         });
         modal.listen(contaRateioAdd);
       }
+      function navigateEdit(referencia) {
+        router.push({ name: "PlanoDeContasFormEdit2", params: { referencia } }); // -> /ContaRateioForm/123
+      }
 
       async function contaRateioAdd(payload) {
         console.log(payload);
@@ -180,7 +184,7 @@
           state.plano = null;
         }
       }
-      return { router, state, callModalConfirm };
+      return { router, state, callModalConfirm, navigateEdit };
     }
   };
 </script>

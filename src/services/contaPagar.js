@@ -11,4 +11,8 @@ export default (httpClient) => ({
     console.log(contaPagar)
     return httpClient.put('/api/contapagar', contaPagar);
   },
+  post: async (contaPagar) => {
+    console.log(contaPagar)
+    return httpClient.post('/api/contapagar', contaPagar);
+  }
 });

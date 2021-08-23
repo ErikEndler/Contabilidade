@@ -18,7 +18,7 @@ import { clearCurrentUser } from "../store/user";
 const API_ENVS = {
   production: "",
   development: "",
-  //local: "https://localhost:44303",
+  //local: "http://192.168.1.93:5000",
   local: "http://192.168.1.93:5001",
 };
 

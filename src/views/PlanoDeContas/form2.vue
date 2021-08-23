@@ -127,15 +127,11 @@
       function sendSubmit(payload) {
         if (payload.answer) {
           const objEnvio = Object.assign({}, toRaw(state.planoDeConta));
-
-          // console.log(JSON.stringify(objEnvio, null, 2));
           console.log("objEnvio - ", objEnvio);
           console.log(JSON.stringify(objEnvio));
           toast.clear();
           state.isLoading = true;
           let req = null;
-          //if (state.conta.codigo) {req = services.planoContas.put(objEnvio);}
-          //else {req = services.contaPagar.post(objEnvio);          }
           req = services.planoContas.post(objEnvio);
           req
             .then(response => {

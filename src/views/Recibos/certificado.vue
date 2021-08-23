@@ -49,7 +49,7 @@
             <td>{{ certificado.caixa_codigo }}</td>
             <td>{{ currentDateTime(certificado.data_lancamento) }}</td>
             <td>{{ certificado.nome }}</td>
-            <td>{{ certificado.cnpj_cpf }}</td>
+            <td>{{ mascaraCpf(certificado.cnpj_cpf) }}</td>
             <td>R$ {{ replaceMoney(certificado.valor) }}</td>
             <td>
               <button @click="openPDF(certificado)" class="btn-sm btn-layout">
@@ -95,6 +95,9 @@
         }
         return valor;
       }
+      function mascaraCpf(cpf) {
+        return cpf.slice(0, 8) + "*****";
+      }
       function openPDF(certificado) {
         modal.open({
           component: "ModalPdf",
@@ -102,8 +105,8 @@
             //
             valor: certificado.valor,
             razaoSocial: certificado.nome,
-            cnpj: certificado.cnpj_cpf,
-            servico: "Certificado",
+            cnpj: mascaraCpf(certificado.cnpj_cpf),
+            servico: "Certificado Digital",
             date: certificado.data_lancamento,
             caixaCodigo: certificado.caixa_codigo
             //
@@ -134,7 +137,14 @@
           });
       }
 
-      return { state, searchCertificado, currentDateTime, replaceMoney, openPDF };
+      return {
+        state,
+        searchCertificado,
+        currentDateTime,
+        replaceMoney,
+        openPDF,
+        mascaraCpf
+      };
     }
   };
 </script>

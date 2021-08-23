@@ -360,7 +360,6 @@
           delete objEnvio.itensContaPagar;
           delete objEnvio.titulo;
           delete objEnvio.fornecedor;
-          // console.log(JSON.stringify(objEnvio, null, 2));
           console.log("objEnvio - ", objEnvio);
           console.log(JSON.stringify(objEnvio));
           toast.clear();
@@ -369,7 +368,10 @@
           if (state.conta.codigo) {
             req = services.contaPagar.put(objEnvio);
           } else {
-            req = services.contaPagar.post(objEnvio);
+            toast.error("Criação de uma nova conta ainda não disponivel", {
+              timeout: false
+            });
+            // req = services.contaPagar.post(objEnvio);
           }
           req
             .then(response => {
@@ -548,7 +550,8 @@
             });
         }
       }
-      function searchConta() {
+      function searchConta(codigo) {
+        router.push({ name: "ContaViewEdit", params: { codigo } });
         getConta(state.search);
       }
       function formReset() {

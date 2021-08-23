@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  front-contabilidade:
+    image: front-contabilidade
+    build:
+      context: .
+    environment:
+      - front-contabilidade
+    ports:
+      - "8081:80"

@@ -1,10 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import useModal from "../hooks/useModal";
+import services from "../services";
+import { setCurrentUser } from "../store/user";
+import { useToast } from "vue-toastification";
+
+
+const modal = useModal();
+const toast = useToast();
 
 const Home = () => import('../views/Home/index.vue')
 const PlanoDeContas = () => import('../views/PlanoDeContas/index.vue')
 const PlanoDeContasList = () => import('../views/PlanoDeContas/listPlano.vue')
-const PlanoDeContasForm = () => import('../views/PlanoDeContas/form.vue')
-const PlanoDeContasForm2 = () => import('../views/PlanoDeContas/form2.vue')
+const PlanoDeContasForm = () => import('../views/PlanoDeContas/form2.vue')
 const ContaRateioForm = () => import('../views/PlanoDeContas/formContaRateio.vue')
 const ContaRateioList = () => import('../views/PlanoDeContas/listContaRateio.vue')
 const Contas = () => import('../views/ContasPagar/index.vue')
@@ -46,16 +53,20 @@ const routes = [
   {
     path: '/recibos',
     name: 'Recibos',
-    component: Recibos
+    component: Recibos,
+    meta: { hasAuth: true }
   },
   {
     path: '/contabilidade/classificacoes',
     name: 'ClassificacaoContabil',
-    component: ContabilidadeViews
+    component: ContabilidadeViews,
+    meta: { hasAuth: true }
+
   }, {
     path: '/contabilidade/xmls',
     name: 'Xmls',
-    component: Xmls
+    component: Xmls,
+    meta: { hasAuth: true },
   },
   {
     path: '/contas',
@@ -100,6 +111,7 @@ const routes = [
     component: PlanoDeContasList,
     meta: { hasAuth: true }
   },
+
   {
     path: '/planodecontas/form',
     name: 'PlanoDeContasForm',
@@ -107,21 +119,8 @@ const routes = [
     meta: { hasAuth: true }
   },
   {
-    path: '/planodecontas/form2',
-    name: 'PlanoDeContasForm2',
-    component: PlanoDeContasForm2,
-    meta: { hasAuth: true }
-  },
-  {
-    path: '/planodecontas/form2/:referencia',
-    name: 'PlanoDeContasFormEdit2',
-    component: PlanoDeContasForm2,
-    meta: { hasAuth: true },
-    props: true
-  },
-  {
     path: '/planodecontas/form/:referencia',
-    name: 'PlanoDeContasFormEdit',
+    name: 'PlanoDeContasFormEdit2',
     component: PlanoDeContasForm,
     meta: { hasAuth: true },
     props: true
@@ -153,5 +152,40 @@ const router = createRouter({
   history: createWebHistory('/'),
   routes
 })
+
+// -- Guarda de rotas da aplicação
+router.beforeEach(async (to, from, next) => {
+  if (to.meta.hasAuth) {
+    const token = window.localStorage.getItem("token");
+    if (!token) {
+      modal.open({ component: "ModalLogin" });
+      next(false);
+    } else if (token) {
+      await services.users.getMe().then((response) => {
+        setCurrentUser(response.data)
+        next()
+      }).catch(error => {
+        toast.error('error de autenticação', { timeout: false });
+        console.log(error);
+        next('/home')
+      });
+    }
+  } else {
+    const token = window.localStorage.getItem("token");
+    if (!token) {
+      next();
+    } else if (token) {
+      await services.users.getMe().then((response) => {
+        setCurrentUser(response.data);
+        next();
+      }).catch(error => {
+        console.log(error);
+        next('/');
+      });
+    }
+  }
+}
+
+);
 
 export default router

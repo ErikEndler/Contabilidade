@@ -65,7 +65,7 @@
                 name="contaDebido"
                 type="text"
                 label="Conta Debido"
-                placeholder="1234"
+                placeholder="1234 (código referência na contabilidade)"
               />
               <TextInput
                 v-model:value="state.fornecedor.contaCredito"
@@ -74,7 +74,7 @@
                 name="contaCredito"
                 type="text"
                 label="Conta Credito"
-                placeholder="1234"
+                placeholder="1234 (código referência na contabilidade)"
               />
             </Form>
           </div>

@@ -168,6 +168,19 @@
 </script>
 
 <style scoped>
+.table.dataTable th {
+  background-color: #00154fec;
+  color: #ffd55a;
+}
+.dataTables_filter {
+  margin: 5px;
+}
+table#example.dataTable tbody tr:hover {
+  background-color: #ffa;
+}
+table#example.dataTable tbody tr:hover > .sorting_1 {
+  background-color: #ffa;
+}
 .card {
   border: 1px solid;
 }

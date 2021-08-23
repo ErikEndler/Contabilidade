@@ -24,7 +24,7 @@
                     !!state.errorMessage.descricao,
                 }"
                 type="text"
-                placeholder="257 - exemplo"
+                placeholder="123 - exemplo"
               />
               <div
                 v-if="!!state.errorMessage.descricao"

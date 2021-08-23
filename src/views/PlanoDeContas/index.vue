@@ -98,7 +98,7 @@
         router.push({ name: "PlanoDeContasList" });
       }
       function navigatePlanoForm() {
-        router.push({ name: "PlanoDeContasForm2" });
+        router.push({ name: "PlanoDeContasForm" });
       }
       function navigateContaRateioForm() {
         router.push({ name: "ContaRateioForm" });
